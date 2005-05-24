@@ -1,0 +1,4 @@
+0.01:
+        * initial release.  test suite works.  no example app yet.
+
+	* requires Crypt::DSA or Crypt::OpenSSL::DSA
