@@ -93,6 +93,22 @@ ok($ctype eq "redirect");
 ok($content =~ m!return\.example\.com/\?foo=bar\&open!);
 ok($content =~ m!\&openid\.sig=M!);
 
+# checking two types of failure cases
+$nos->setup_url("http://setup.example.com/");
+$nos->is_trusted(sub { 0; });
+
+# immediate mode:
+$query_string = "openid.mode=checkid_immediate&openid.is_identity=http://bradfitz.com/&openid.return_to=http://return.example.com/%3Ffoo%3Dbar";
+$parse->();
+($ctype, $content) = $nos->handle_page;
+ok($ctype eq "redirect");
+
+# setup mode:
+$query_string = "openid.mode=checkid_setup&openid.is_identity=http://bradfitz.com/&openid.return_to=http://return.example.com/%3Ffoo%3Dbar";
+$parse->();
+($ctype, $content) = $nos->handle_page;
+ok($ctype eq "setup");
+ok($content->{return_to} eq "http://return.example.com/?foo=bar");
 
 sub durl
 {

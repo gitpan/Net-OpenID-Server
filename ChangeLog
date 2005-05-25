@@ -1,3 +1,8 @@
+0.03:
+        * stupid push_url_arg bugfix
+
+	* more tests
+	
 0.02:
         * checkid_immediate vs checkid_setup mode (handle_page can return
 	  $type of "setup")

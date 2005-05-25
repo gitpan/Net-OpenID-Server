@@ -7,7 +7,7 @@ use Carp ();
 package Net::OpenID::Server;
 
 use vars qw($VERSION $HAS_CRYPT_DSA $HAS_CRYPT_OPENSSL);
-$VERSION = "0.02";
+$VERSION = "0.03";
 
 use fields (
             'last_errcode',   # last error code we got
@@ -450,7 +450,7 @@ sub _push_url_arg {
     while (@_) {
         my $key = shift;
         my $value = shift;
-        $$uref .= $got_qmark ? "&" : ($got_qmark = 0, "?");
+        $$uref .= $got_qmark ? "&" : ($got_qmark = 1, "?");
         $$uref .= _eurl($key) . "=" . _eurl($value);
     }
 }
