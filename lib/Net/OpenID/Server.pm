@@ -7,7 +7,7 @@ use Carp ();
 package Net::OpenID::Server;
 
 use vars qw($VERSION $HAS_CRYPT_DSA $HAS_CRYPT_OPENSSL);
-$VERSION = "0.01";
+$VERSION = "0.02";
 
 use fields (
             'last_errcode',   # last error code we got
@@ -124,6 +124,9 @@ sub args {
 
 # returns ($content_type, $page), where $content_type can be "redirect"
 # in which case a temporary redirect should be done to the URL in $page
+# $content_type can also be "setup", in which case the setup_map variables
+# are in $page as a hashref, and caller has full control from there.
+#
 # returns undef on error, in which case caller should generate an error
 # page using info in $nos->err.
 sub handle_page {
@@ -133,6 +136,10 @@ sub handle_page {
 
     return $self->_page_pubkey
         if $self->args("openid.mode") eq "getpubkey";
+
+    my $mode = $self->args("openid.mode") || "checkid_immediate";
+
+    return $self->_fail("unknown_mode") unless $mode =~ /^checkid_(?:immediate|setup)/;
 
     my $return_to = $self->args("openid.return_to");
     return $self->_fail("no_return_to") unless $return_to =~ m!^https?://!;
@@ -176,19 +183,29 @@ sub handle_page {
                       "openid.sig",             $sig64,
                       "openid.timestamp",       $now,
                       "openid.return_to",       $return_to);
-    } else {
-        # normal case, with setup URL
-        my $setup_url = $self->{setup_url} or Carp::croak("No setup_url defined.");
-        _push_url_arg(\$setup_url,
-                      $self->_setup_map("trust_root"),  $trust_root,
-                      $self->_setup_map("return_to"),   $return_to,
-                      $self->_setup_map("post_grant"),  $self->args("openid.post_grant"),
-                      $self->_setup_map("is_identity"), $identity);
-        _push_url_arg(\$ret_url,
-                      "openid.user_setup_url",  $setup_url);
+        return ("redirect", $ret_url);
     }
 
-    return ("redirect", $ret_url);
+    # assertion could not be made, so user requires setup (login/trust.. something)
+    # two ways that can happen:  caller might have asked us for an immediate return
+    # with a setup URL (the default), or explictly said that we're in control of
+    # the user-agent's full window, and we can do whatever we want with them now.
+    my %setup_args = (
+                      $self->_setup_map("trust_root"),  $trust_root,
+                      $self->_setup_map("return_to"),   $return_to,
+                      $self->_setup_map("is_identity"), $identity,
+                      );
+    if ($mode eq "checkid_immediate") {
+        # normal case, with setup URL returned
+        my $setup_url = $self->{setup_url} or Carp::croak("No setup_url defined.");
+        _push_url_arg(\$setup_url, %setup_args);
+        _push_url_arg(\$ret_url, "openid.user_setup_url",  $setup_url);
+        return ("redirect", $ret_url);
+    } else {
+        # the "checkid_setup" mode, where we take control of the user-agent
+        # and return to their return_to URL later.
+        return ("setup", \%setup_args);
+    }
 }
 
 sub _setup_map {
@@ -373,6 +390,7 @@ sub _eurl
     return $a;
 }
 
+# FIXME: duplicated in Net::OpenID::Consumer's VerifiedIdentity
 sub _url_is_under {
     my ($root, $test, $err_ref) = @_;
 
@@ -459,13 +477,19 @@ Net::OpenID::Server - library for consumers of OpenID identities
     setup_map    => { "post_grant" => "do_after_grant" },
   );
 
-  my ($ctype, $page) = $nos->handle_page;
+  # From your OpenID server endpoint:
 
-  if ($ctype eq "redirect) {
-      redirect_to($page);
+  my ($type, $data) = $nos->handle_page;
+  if ($type eq "redirect") {
+      WebApp::redirect_to($data);
+  } elsif ($type eq "setup") {
+      my %setup_opts = %$data;
+      # ... show them setup page(s), with options from setup_map
+      # it's then your job to redirect them at the end to "return_to"
+      # (or whatever you've named it in setup_map)
   } else {
-      set_content_type($ctype);
-      print($page);
+      WebApp::set_content_type($type);
+      WebApp::print($data);
   }
 
 =head1 DESCRIPTION
@@ -493,13 +517,31 @@ See below for docs.
 
 =over 4
 
-=item ($content_type, $page) = $nos->B<handle_page>
+=item ($type, $data) = $nos->B<handle_page>
 
-Returns a $content_type and $page content.  If $content_type eq
-"redirect", then you should temporary redirect the user to the URL
-$page.
+Returns a $type and $data, where $type can be:
 
-Otherwise, set the content type and print the $page out.
+=over
+
+=item C<redirect>
+
+... in which case you redirect the user (via your web framework's
+redirect functionality) to the URL specified in $data.
+
+=item C<setup>
+
+... in which case you should show the user a page (or redirect them to
+one of your pages) where they can setup trust for the given
+"trust_root" in the hashref in $data, and then redirect them to
+"return_to" at the end.  Note that the parameters in the $data hashref
+are as you named them with setup_map.
+
+=item Some content type
+
+Otherwise, set the content type to $type and print the page out, the
+contents of which are in $data.
+
+=back
 
 =item $nos->B<args>($ref)
 

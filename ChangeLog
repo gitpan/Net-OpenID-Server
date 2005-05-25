@@ -1,3 +1,7 @@
+0.02:
+        * checkid_immediate vs checkid_setup mode (handle_page can return
+	  $type of "setup")
+	
 0.01:
         * initial release.  test suite works.  no example app yet.
 
