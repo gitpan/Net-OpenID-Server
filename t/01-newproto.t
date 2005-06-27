@@ -40,6 +40,8 @@ login_im_fail();
 login_setup_fail();
 login_setup_fail2();
 
+login_bogus_handle();
+
 sub assoc_clear {
     %get = ();
     # regular associate
@@ -117,6 +119,42 @@ sub login_success {
     }
     my $good_sig = _b64(hmac_sha1($token, $secret));
     ok($rarg{'openid.sig'}, $good_sig);
+}
+
+# try to login, with success
+sub login_bogus_handle {
+    $nos->is_identity(sub { 1; });
+    $nos->is_trusted(sub { 1; });
+    $nos->get_user(sub { "brad"; });
+    %post = ();
+    %get = (
+            "openid.mode" => "checkid_immediate",
+            "openid.identity" => "http://bradfitz.com/",
+            "openid.return_to" => "http://trust.root/return/",
+            "openid.trust_root" => "http://trust.root/",
+            "openid.assoc_handle" => "GIBBERISH",
+            );
+    ($ctype, $content) = $nos->handle_page;
+    is($ctype, "redirect");
+    ok($content =~ s!^http://trust.root/return/\?!!);
+    my %rarg = map { durl($_) } split(/[\&\=]/, $content);
+    is($rarg{'openid.invalidate_handle'}, "GIBBERISH");
+
+    # try to verify it with check_authentication
+    %get = ();
+    %post = (
+             "openid.mode" => "check_authentication",
+             );
+    foreach my $p ("assoc_handle", "sig", "signed", "invalidate_handle",
+                   split(/,/, $rarg{"openid.signed"}))
+    {
+        $post{"openid.$p"} ||= $rarg{"openid.$p"};
+    }
+    ($ctype, $content) = $nos->handle_page;
+    is($ctype, "text/plain");
+    %rarg = parse_reply($content);
+    is($rarg{"invalidate_handle"}, "GIBBERISH");
+    ok($rarg{"lifetime"} > 0);
 }
 
 # try to login, but fail (immediately)
