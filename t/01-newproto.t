@@ -54,6 +54,7 @@ sub assoc_clear {
     %res = parse_reply($content);
     ok($res{assoc_handle});
     $ahandle = $res{'assoc_handle'};
+    ok($ahandle !~ /\bSTLS\./);
     is($res{assoc_type}, "HMAC-SHA1");
     ok(good_date($res{expiry}));
     ok(good_date($res{issued}));
@@ -90,6 +91,7 @@ sub assoc_dh {
     my $server_pub = _arg2bi($res{'dh_server_public'});
     my $dh_sec = $dh->compute_secret($server_pub);
     $ahandle = $res{'assoc_handle'};
+    ok($ahandle !~ /\bSTLS\./);
     is(length(_d64($res{'enc_mac_key'})), 20);
     is(length(sha1(_bi2bytes($dh_sec))),  20);
     $secret = _d64($res{'enc_mac_key'}) ^ sha1(_bi2bytes($dh_sec));
@@ -119,6 +121,21 @@ sub login_success {
     }
     my $good_sig = _b64(hmac_sha1($token, $secret));
     ok($rarg{'openid.sig'}, $good_sig);
+
+    # and verify that check_authentication never lets this succeed
+    %get = ();
+    %post = (
+             "openid.mode" => "check_authentication",
+             );
+    foreach my $p ("assoc_handle", "sig", "signed", "invalidate_handle",
+                   split(/,/, $rarg{"openid.signed"}))
+    {
+        $post{"openid.$p"} ||= $rarg{"openid.$p"};
+    }
+    ($ctype, $content) = $nos->handle_page;
+    is($ctype, "text/plain");
+    %rarg = parse_reply($content);
+    ok($rarg{"error"} =~ /bad_handle/);
 }
 
 # try to login, with success
@@ -139,6 +156,7 @@ sub login_bogus_handle {
     ok($content =~ s!^http://trust.root/return/\?!!);
     my %rarg = map { durl($_) } split(/[\&\=]/, $content);
     is($rarg{'openid.invalidate_handle'}, "GIBBERISH");
+    ok($rarg{'openid.assoc_handle'} =~ /\bSTLS\./);
 
     # try to verify it with check_authentication
     %get = ();
@@ -153,8 +171,8 @@ sub login_bogus_handle {
     ($ctype, $content) = $nos->handle_page;
     is($ctype, "text/plain");
     %rarg = parse_reply($content);
-    is($rarg{"invalidate_handle"}, "GIBBERISH");
     ok($rarg{"lifetime"} > 0);
+    is($rarg{"invalidate_handle"}, "GIBBERISH");
 }
 
 # try to login, but fail (immediately)
