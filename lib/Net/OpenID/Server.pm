@@ -7,7 +7,7 @@ use Carp ();
 package Net::OpenID::Server;
 
 use vars qw($VERSION);
-$VERSION = "0.11";
+$VERSION = "0.12";
 
 use fields (
             'last_errcode',   # last error code we got
@@ -630,6 +630,7 @@ sub _fail {
 
 sub err {
     my Net::OpenID::Server $self = shift;
+    return undef unless $self->{last_errcode};
     $self->{last_errcode} . ": " . $self->{last_errtext};
 }
 
@@ -806,7 +807,7 @@ __END__
 
 =head1 NAME
 
-Net::OpenID::Server - library for consumers of OpenID identities
+Net::OpenID::Server - library for building your own OpenID server
 
 =head1 SYNOPSIS
 
@@ -817,7 +818,7 @@ Net::OpenID::Server - library for consumers of OpenID identities
     post_args    => $cgi,
     get_user     => \&get_user,
     is_identity  => \&is_identity,
-    is_trusted   => \&is_trusted
+    is_trusted   => \&is_trusted,
     setup_url    => "http://example.com/pass-identity.bml",
   );
 
