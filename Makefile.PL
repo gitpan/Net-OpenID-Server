@@ -1,13 +1,56 @@
-use ExtUtils::MakeMaker;
-WriteMakefile( 'NAME' => 'Net::OpenID::Server',
-               'VERSION_FROM' => 'lib/Net/OpenID/Server.pm',
-               'PREREQ_PM' => {
-                   'URI'            => 0,
-                   'MIME::Base64'   => 0,
-                   'Digest::SHA1'   => 0,
-                   'Crypt::DH'      => 0.05,
-               },
-               ($] >= 5.005 ?
-                (ABSTRACT_FROM => 'lib/Net/OpenID/Server.pm',
-                 AUTHOR     => 'Brad Fitzpatrick <brad@danga.com>') : ()),
-               );
+
+use strict;
+use warnings;
+
+
+
+use ExtUtils::MakeMaker 6.31;
+
+
+
+my %WriteMakefileArgs = (
+  'ABSTRACT' => 'library for building your own OpenID server',
+  'AUTHOR' => 'Robert Norris <rob@eatenbyagrue.org>',
+  'BUILD_REQUIRES' => {
+    'Test::More' => '0'
+  },
+  'CONFIGURE_REQUIRES' => {
+    'ExtUtils::MakeMaker' => '6.31'
+  },
+  'DISTNAME' => 'Net-OpenID-Server',
+  'EXE_FILES' => [],
+  'LICENSE' => 'perl',
+  'NAME' => 'Net::OpenID::Server',
+  'PREREQ_PM' => {
+    'Digest::SHA' => '0',
+    'MIME::Base64' => '0',
+    'Net::OpenID::Common' => '1.030099_001',
+    'URI' => '0'
+  },
+  'VERSION' => '1.030099_001',
+  'test' => {
+    'TESTS' => 't/*.t'
+  }
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+

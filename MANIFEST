@@ -1,9 +1,10 @@
-Makefile.PL
-ChangeLog
+Changes
+LICENSE
 MANIFEST
-lib/Net/OpenID/Server.pm
-t/00-all.t
-t/01-newproto.t
+META.json
+META.yml
+Makefile.PL
+README
 doc/catalyst_sample
-
-META.yml                                 Module meta-data (added by MakeMaker)
+lib/Net/OpenID/Server.pm
+t/00-use.t

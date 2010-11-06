@@ -1,14 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-OpenID-Server
-version:      1.02
-version_from: lib/Net/OpenID/Server.pm
-installdirs:  site
+---
+abstract: 'library for building your own OpenID server'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenID-Server
 requires:
-    Crypt::DH:                     0.05
-    Digest::SHA1:                  0
-    MIME::Base64:                  0
-    URI:                           0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  Digest::SHA: 0
+  MIME::Base64: 0
+  Net::OpenID::Common: 1.030099_001
+  URI: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenID-Server
+  repository: git://github.com/robn/Net-OpenID-Server.git
+version: 1.030099_001
