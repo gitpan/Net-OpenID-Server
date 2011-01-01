@@ -1,10 +1,10 @@
 {
-   "abstract" : "library for building your own OpenID server",
+   "abstract" : "Library for building your own OpenID server",
    "author" : [
       "Robert Norris <rob@eatenbyagrue.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "generated_by" : "Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400",
    "license" : [
       "perl_5"
    ],
@@ -39,12 +39,13 @@
          "mailto" : "bug-net-openid-server@rt.cpan.org",
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenID-Server"
       },
+      "homepage" : "http://groups.google.com/group/openid-perl",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robn/Net-OpenID-Server.git",
          "web" : "http://github.com/robn/Net-OpenID-Server"
       }
    },
-   "version" : "1.030099_001"
+   "version" : "1.030099_002"
 }
 

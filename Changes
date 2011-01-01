@@ -1,3 +1,15 @@
+1.030099_002 Jan 01 2011
+
+    * Remove unusued _eurl function (Robert Norris)
+
+    * Made 'assoc_handle' argument optional for indirect requests per
+      http://openid.net/specs/openid-authentication-2_0.html#anchor27
+      (Mario Domgoergen)
+
+    * Added example CGI program (Robert Norris)
+ 
+    * Documentation tweaks (Robert Norris)
+ 
 1.030099_001 Nov 06 2010
 
     * Use Crypt::DH::GMP over Crypt::DH for speed (Robert Norris)

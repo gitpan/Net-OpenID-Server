@@ -8,7 +8,7 @@ use Net::OpenID::IndirectMessage;
 ############################################################################
 package Net::OpenID::Server;
 BEGIN {
-  $Net::OpenID::Server::VERSION = '1.030099_001';
+  $Net::OpenID::Server::VERSION = '1.030099_002';
 }
 
 use fields (
@@ -374,10 +374,16 @@ sub _mode_checkid {
                       $self->_setup_map("realm"),        $trust_root,
                       $self->_setup_map("return_to"),    $return_to,
                       $self->_setup_map("identity"),     $identity,
-                      $self->_setup_map("assoc_handle"), $self->args("openid.assoc_handle"),
-                      $self->_setup_map("assoc_type"),   $self->_determine_assoc_type_from_assoc_handle($self->args("openid.assoc_handle")),
                       );
     $setup_args{$self->_setup_map('ns')} = $self->args('openid.ns') if $self->args('openid.ns');
+
+    if ( $self->args("openid.assoc_handle") ) {
+        $setup_args{ $self->_setup_map("assoc_handle") } =
+          $self->args("openid.assoc_handle");
+        $setup_args{ $self->_setup_map("assoc_type") } =
+          $self->_determine_assoc_type_from_assoc_handle(
+            $self->args("openid.assoc_handle") );
+    }
 
     my $setup_url = $self->{setup_url} or Carp::croak("No setup_url defined.");
     OpenID::util::push_url_arg(\$setup_url, %setup_args);
@@ -761,14 +767,6 @@ sub errtext {
     $self->{last_errtext};
 }
 
-sub _eurl
-{
-    my $a = $_[0];
-    $a =~ s/([^a-zA-Z0-9_\,\-.\/\\\: ])/uc sprintf("%%%02x",ord($1))/eg;
-    $a =~ tr/ /+/;
-    return $a;
-}
-
 # FIXME: duplicated in Net::OpenID::Consumer's VerifiedIdentity
 sub _url_is_under {
     my ($root, $test, $err_ref) = @_;
@@ -831,11 +829,11 @@ __END__
 
 =head1 NAME
 
-Net::OpenID::Server - library for building your own OpenID server
+Net::OpenID::Server - Library for building your own OpenID server
 
 =head1 VERSION
 
-version 1.030099_001
+version 1.030099_002
 
 =head1 SYNOPSIS
 

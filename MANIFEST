@@ -5,6 +5,6 @@ META.json
 META.yml
 Makefile.PL
 README
-doc/catalyst_sample
+examples/server.cgi
 lib/Net/OpenID/Server.pm
 t/00-use.t
