@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.31;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Library for building your own OpenID server',
+  'ABSTRACT' => 'Library for building your own OpenID server/provider',
   'AUTHOR' => 'Robert Norris <rob@eatenbyagrue.org>',
   'BUILD_REQUIRES' => {
     'Test::More' => '0'
@@ -24,10 +24,10 @@ my %WriteMakefileArgs = (
   'PREREQ_PM' => {
     'Digest::SHA' => '0',
     'MIME::Base64' => '0',
-    'Net::OpenID::Common' => '1.030099_001',
+    'Net::OpenID::Common' => '1.11',
     'URI' => '0'
   },
-  'VERSION' => '1.030099_002',
+  'VERSION' => '1.09',
   'test' => {
     'TESTS' => 't/*.t'
   }

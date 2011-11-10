@@ -1,10 +1,10 @@
 {
-   "abstract" : "Library for building your own OpenID server",
+   "abstract" : "Library for building your own OpenID server/provider",
    "author" : [
       "Robert Norris <rob@eatenbyagrue.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400",
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
          "requires" : {
             "Digest::SHA" : 0,
             "MIME::Base64" : 0,
-            "Net::OpenID::Common" : "1.030099_001",
+            "Net::OpenID::Common" : "1.11",
             "URI" : 0
          }
       },
@@ -33,7 +33,7 @@
          }
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-net-openid-server@rt.cpan.org",
@@ -46,6 +46,6 @@
          "web" : "http://github.com/robn/Net-OpenID-Server"
       }
    },
-   "version" : "1.030099_002"
+   "version" : "1.09"
 }
 

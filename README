@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Net-OpenID-Server,
-version 1.030099_002:
+version 1.09:
 
-  Library for building your own OpenID server
+  Library for building your own OpenID server/provider
 
 This software is copyright (c) 2005 by Brad Fitzpatrick.
 

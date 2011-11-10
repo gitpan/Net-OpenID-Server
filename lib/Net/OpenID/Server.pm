@@ -8,7 +8,7 @@ use Net::OpenID::IndirectMessage;
 ############################################################################
 package Net::OpenID::Server;
 BEGIN {
-  $Net::OpenID::Server::VERSION = '1.030099_002';
+  $Net::OpenID::Server::VERSION = '1.09';
 }
 
 use fields (
@@ -829,11 +829,11 @@ __END__
 
 =head1 NAME
 
-Net::OpenID::Server - Library for building your own OpenID server
+Net::OpenID::Server - Library for building your own OpenID server/provider
 
 =head1 VERSION
 
-version 1.030099_002
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -1030,7 +1030,7 @@ not touched.  It's simply given back to your other callbacks
 
 =item $code = $nos->B<get_identity>; $identity = $code->($u, $identity);
 
-For OpenID 2.0. Get/set the subref returning a identity. This is called 
+For OpenID 2.0. Get/set the subref returning a identity. This is called
 when claimed identity is 'identifier_select'.
 
 =item $nos->B<is_identity>($code)
